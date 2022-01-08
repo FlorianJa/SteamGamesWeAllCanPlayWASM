@@ -11,9 +11,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("ConnectionSqlite");
-builder.Services.AddAuthentication(options => { options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme; })
+builder.Services.AddAuthentication(options => 
+                { 
+                    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme; 
+                })
                 .AddCookie(options =>
                 {
+                    //options.Cookie.SameSite = SameSiteMode.Unspecified;
                     options.LoginPath = "/signin";
                     options.LogoutPath = "/signout";
                     options.AccessDeniedPath = "/";
@@ -61,7 +65,7 @@ else
     app.UseHsts();
 }
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
@@ -72,12 +76,9 @@ app.UseCookiePolicy(new CookiePolicyOptions
 });
 
 app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseRouting();
-
-
-
-app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();

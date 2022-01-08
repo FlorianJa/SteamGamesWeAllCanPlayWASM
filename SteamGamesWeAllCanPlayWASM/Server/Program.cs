@@ -34,7 +34,11 @@ builder.Services.AddAuthentication(options => { options.DefaultScheme = CookieAu
                     options.Events.OnSignedIn = ValidationHelper.SignIn;
                     options.Events.OnValidatePrincipal = ValidationHelper.Validate;
                 })
-                .AddSteam();
+                .AddSteam(options =>
+                {
+                    options.CorrelationCookie.SameSite = SameSiteMode.None;
+                    options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+                });
 
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
@@ -64,7 +68,10 @@ app.UseAuthentication();
 
 app.UseRouting();
 
-app.UseCookiePolicy();
+app.UseCookiePolicy(new CookiePolicyOptions
+{
+    Secure = CookieSecurePolicy.Always
+});
 
 app.UseAuthorization();
 

@@ -11,19 +11,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("ConnectionSqlite");
-builder.Services.AddDataProtection()
-    .SetApplicationName("SteamGamesWeAllCanPlay")
-    .PersistKeysToFileSystem(new System.IO.DirectoryInfo(@"/var/dpkeys/"));
-
-builder.Services.AddDbContext<ApplicationContext>(options =>
-    options.UseSqlite(connectionString));
-
-builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-builder.Services.AddTransient<IUserRepository, UserRepository>();
-
-builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
-
 builder.Services.AddAuthentication(options => { options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme; })
                 .AddCookie(options =>
                 {
@@ -39,6 +26,21 @@ builder.Services.AddAuthentication(options => { options.DefaultScheme = CookieAu
                     options.CorrelationCookie.SameSite = SameSiteMode.None;
                     options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
                 });
+
+builder.Services.AddDataProtection()
+    .SetApplicationName("SteamGamesWeAllCanPlayWASM")
+    .PersistKeysToFileSystem(new System.IO.DirectoryInfo(@"/var/dpkeys/"));
+
+builder.Services.AddDbContext<ApplicationContext>(options =>
+    options.UseSqlite(connectionString));
+
+builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddTransient<IUserRepository, UserRepository>();
+
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+
+
 
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
@@ -59,19 +61,21 @@ else
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
-
-app.UseAuthentication();
-
-app.UseRouting();
 
 app.UseCookiePolicy(new CookiePolicyOptions
 {
     Secure = CookieSecurePolicy.Always
 });
+
+app.UseAuthentication();
+
+app.UseRouting();
+
+
 
 app.UseAuthorization();
 

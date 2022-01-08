@@ -9,8 +9,7 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["SteamGamesWeAllCanPlayWASM/Server/SteamGamesWeAllCanPlayWASM.Server.csproj", "SteamGamesWeAllCanPlayWASM/Server/"]
 COPY ["SteamGamesWeAllCanPlayWASM/Shared/SteamGamesWeAllCanPlayWASM.Shared.csproj", "SteamGamesWeAllCanPlayWASM/Shared/"]
-COPY ["SteamGamesWeAllCanPlayWASM/Client/SteamGamesWeAllCanPlayWASM.Client.csproj", "SteamGamesWeAllCanPlayWASM/Client/"]
-COPY ["SteamGamesWeAllCanPlayWASM.Data/SteamGamesWeAllCanPlayWASM.Data.csproj", "SteamGamesWeAllCanPlayWASM.Data/"]
+COPY ["SteamGamesWeAllCanPlayWASM/Client/SteamGamesWeAllCanPlayWASM.Client.csproj", "SteamGamesWeAllCanPlayWASM/Client/"]]
 RUN dotnet restore "SteamGamesWeAllCanPlayWASM/Server/SteamGamesWeAllCanPlayWASM.Server.csproj"
 COPY . .
 WORKDIR "/src/SteamGamesWeAllCanPlayWASM/Server"

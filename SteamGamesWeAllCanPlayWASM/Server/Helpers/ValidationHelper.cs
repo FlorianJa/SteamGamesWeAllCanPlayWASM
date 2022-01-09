@@ -80,7 +80,7 @@ namespace SteamGamesWeAllCanPlayWASM.Server.Helpers
             {
                 List<Claim> claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, user.SteamId),
+                    new Claim(ClaimTypes.Name, user.Name),
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
                 };
 

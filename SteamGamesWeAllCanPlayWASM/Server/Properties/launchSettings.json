@@ -33,7 +33,7 @@
       "environmentVariables": {
         "STEAM_API_KEY": "TEST"
       },
-      "DockerfileRunArguments": "-v steamgamesweallcanplay:/database",
+      "DockerfileRunArguments": "-v steamgamesweallcanplay:/database -e STEAM_API_KEY=STEAM_API_KEYGOESHERE",
       "publishAllPorts": true,
       "useSSL": true
     }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using SteamGamesWeAllCanPlay.Helper;
+using SteamGamesWeAllCanPlayWASM.Client.Services;
 using SteamGamesWeAllCanPlayWASM.Data;
 using SteamGamesWeAllCanPlayWASM.Data.Repositories;
 using SteamGamesWeAllCanPlayWASM.Server.Helpers;
@@ -11,7 +12,11 @@ using SteamWebAPI2.Utilities;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("ConnectionSqlite");
+//var connectionString = builder.Configuration.GetConnectionString("ConnectionSqlite");
+string connectionString = Environment.GetEnvironmentVariable("CONNECTIONSTRING_SQLITE");
+
+builder.Services.AddDbContext<ApplicationContext>(options =>
+    options.UseSqlite(connectionString));
 
 builder.Services.AddAuthentication(options => 
                 { 
@@ -35,7 +40,7 @@ builder.Services.AddAuthentication(options =>
 
 string steamAPIKey = Environment.GetEnvironmentVariable("STEAM_API_KEY");
 
-Console.WriteLine("SteamKey:"+steamAPIKey);
+//Console.WriteLine("SteamKey:"+steamAPIKey);
 
 builder.Services.AddTransient(x => new SteamWebInterfaceFactory(steamAPIKey));
 
@@ -43,8 +48,7 @@ builder.Services.AddDataProtection()
     .SetApplicationName("SteamGamesWeAllCanPlayWASM")
     .PersistKeysToFileSystem(new System.IO.DirectoryInfo(@"/var/dpkeys/"));
 
-builder.Services.AddDbContext<ApplicationContext>(options =>
-    options.UseSqlite(connectionString));
+
 
 builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddTransient<IUserRepository, UserRepository>();

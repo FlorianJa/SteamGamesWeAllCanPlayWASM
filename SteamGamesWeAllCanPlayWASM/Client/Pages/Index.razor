@@ -1,12 +1,30 @@
 ﻿@page "/"
+@inject AuthenticationStateProvider AuthProvider
 
 <PageTitle>Steam games we all can play</PageTitle>
 
 <AuthorizeView>
     <Authorized>
-        Hello                    
+        <SteamGamesWeAllCanPlayWASM.Client.Components.UserOverview></SteamGamesWeAllCanPlayWASM.Client.Components.UserOverview>                  
     </Authorized>
     <NotAuthorized>
         Please log in first.
     </NotAuthorized>
 </AuthorizeView>
+
+
+@code{
+    
+    public string UserName = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var authstate = await AuthProvider.GetAuthenticationStateAsync();
+
+        if (authstate.User.Identity.Name != null)
+        {
+            UserName = authstate.User.Identity.Name;
+        }
+    }
+}

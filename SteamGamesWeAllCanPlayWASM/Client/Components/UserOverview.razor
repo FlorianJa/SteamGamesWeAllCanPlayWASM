@@ -1,0 +1,71 @@
+﻿@using SteamGamesWeAllCanPlayWASM.Client.Services
+@inject AuthenticationStateProvider AuthProvider
+@inject UserService userService
+
+<div class="overviewContainer">
+    <div class="avatar">
+        <img src=@AvatarURL/>
+    </div>
+    <div class="userName">
+        @if (@UserName != string.Empty)
+        {
+            <h2>@UserName</h2>
+            <p>@FriendCount Freunde (davon @FriendsOnline online)</p>
+            <p>@Games Spiele in der Bibliothek</p>
+        }
+        else
+        {
+            <p>Loading...</p>
+        }
+    </div>
+
+</div>
+
+
+@code {
+
+
+    public string UserName = string.Empty;
+    public string AvatarURL;
+    public int FriendCount = 0;
+    public int FriendsOnline = 0;
+    public uint Games = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var authstate = await AuthProvider.GetAuthenticationStateAsync();
+
+        if (authstate.User.Identity.IsAuthenticated)
+        {
+            UserName = authstate.User.Identity.Name;
+            var steamid = authstate.User.Claims.FirstOrDefault(c => c.Type == "SteamId").Value;
+            var overview = await userService.GetOverviewAsync(steamid);
+
+            FriendCount = overview.FriendsCount;
+            FriendsOnline = overview.FriendsOnline;
+            Games = overview.GameCount;
+        }
+
+       
+        //if(authstate.User != null)
+        //{
+        //    var user = authstate.User;
+        //    var steamId = user.Identity.Name;
+
+        //    var players = await steamProfileService.GetPlayerSummariesAsync(new List<string>(){ steamId });
+        //    if (players.Count() > 0)
+        //    {
+        //        var player = players.First();
+        //        UserName = player.PersonaName;
+        //        AvatarURL = player.AvatarFull;
+        //    }
+
+        //    var FriendList = await steamProfileService.GetFriendListAsync(steamId);
+        //    FriendCount = FriendList.Count();
+        //    FriendsOnline = FriendList.Count(p => p.PersonaState != 0);
+
+        //    Games = await steamProfileService.GetGameCount(steamId);
+        //}
+    }
+}

@@ -1,0 +1,16 @@
+﻿.overviewContainer{
+    display: flex;
+}
+.avatar{
+    width: 120px;
+}
+.userName{
+    flex-grow: 1;
+}
+.avatar img {
+    height: 100px;
+}
+
+p{
+    margin-bottom: 0px;
+}

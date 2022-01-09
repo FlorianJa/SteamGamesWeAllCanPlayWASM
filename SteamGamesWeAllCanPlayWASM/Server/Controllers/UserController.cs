@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using SteamGamesWeAllCanPlayWASM.Data.Repositories;
+using SteamGamesWeAllCanPlayWASM.Shared.Models;
+using SteamWebAPI2.Interfaces;
+using SteamWebAPI2.Utilities;
 using System.Security.Claims;
 
 namespace SteamGamesWeAllCanPlayWASM.Server.Controllers
@@ -12,10 +15,14 @@ namespace SteamGamesWeAllCanPlayWASM.Server.Controllers
     {
 
         private readonly IUserRepository _userRepo;
+        private readonly SteamWebInterfaceFactory _steamFactory;
+        private readonly HttpClient _client;
 
-        public UserController(IUserRepository userRepo)
+        public UserController(IUserRepository userRepo, SteamWebInterfaceFactory steamFactory, HttpClient client)
         {
             _userRepo = userRepo;
+            _steamFactory = steamFactory;
+            _client = client;
         }
 
         [HttpGet("me")]
@@ -55,6 +62,27 @@ namespace SteamGamesWeAllCanPlayWASM.Server.Controllers
             {
                 RedirectUri = returnUrl,
             }, CookieAuthenticationDefaults.AuthenticationScheme);
+        }
+
+        [HttpGet("{steamId}/overview")]
+        public async Task<IActionResult> GetUserOverview(string steamId)
+        {
+            var friendListResponse = await _steamFactory.CreateSteamWebInterface<SteamUser>(_client).GetFriendsListAsync(ulong.Parse(steamId));
+            var playerSummariesResponse = await _steamFactory.CreateSteamWebInterface<SteamUser>(_client).GetPlayerSummariesAsync(friendListResponse.Data.Select(p => p.SteamId).ToList());
+            var friendCount = friendListResponse.Data.Count();
+            var onlineFriendCount = playerSummariesResponse.Data.Count(s => s.UserStatus != Steam.Models.SteamCommunity.UserStatus.Offline);
+
+            var gamesResponse = await _steamFactory.CreateSteamWebInterface<PlayerService>(_client).GetOwnedGamesAsync(ulong.Parse(steamId), includeFreeGames: true);
+            var gameCount = gamesResponse.Data.GameCount;
+
+            var overview = new MUserOverview()
+            {
+                FriendsOnline = onlineFriendCount,
+                FriendsCount = friendCount,
+                GameCount = gameCount
+            };
+
+            return Ok(overview);
         }
     }
 }

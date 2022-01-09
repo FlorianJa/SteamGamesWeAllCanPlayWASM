@@ -55,7 +55,7 @@ namespace SteamGamesWeAllCanPlayWASM.Client.Providers
             {
                 identity = new ClaimsIdentity(new[]
                 {
-                    new Claim(ClaimTypes.Name, User.SteamId),
+                    new Claim(ClaimTypes.Name, User.Name),
                     new Claim(ClaimTypes.NameIdentifier, User.Id.ToString()),
                     new Claim("SteamId", User.SteamId),
                 }, "Steam");

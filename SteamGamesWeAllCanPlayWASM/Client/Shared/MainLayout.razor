@@ -1,5 +1,8 @@
-﻿@inherits LayoutComponentBase
-@inject AuthenticationStateProvider AuthenticationStateProvider
+﻿@using System.Net
+@using SteamGamesWeAllCanPlayWASM.Client.Providers
+@using SteamGamesWeAllCanPlayWASM.Shared.Models
+@inherits LayoutComponentBase
+@inject AuthenticationStateProvider AuthProvider
 
 
 
@@ -8,7 +11,7 @@
         <div class="top-row px-4">
             <AuthorizeView>
                 <Authorized>
-                    <p>@context.User.Identity.Name</p>
+                    <p>Hallo @UserName</p>
                     <a class="btn"href="/signout">Sign Out</a>
                     
                 </Authorized>
@@ -25,4 +28,42 @@
         </article>
     </main>
 </div>
+
+@code
+{
+
+    public string UserName = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var authstate = await AuthProvider.GetAuthenticationStateAsync();
+
+        if (authstate.User.Identity.Name != null)
+        {
+            UserName = authstate.User.Identity.Name;
+        }
+    }
+    //}
+    //[Inject]
+    //public HttpClient HttpClient { get; set; }
+
+    //public bool isLoaded { get; set; }
+
+    //public MUser User { get; set; }
+
+
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    var response = await HttpClient.GetAsync($"api/users/{context.User.Identity.Name}");
+    //    isLoaded = true;
+    //    if (response.StatusCode == HttpStatusCode.OK)
+    //    {
+    //        User = await response.Content.ReadFromJsonAsync<MUser>();
+    //    }
+    //}
+
+
+    
+}
 

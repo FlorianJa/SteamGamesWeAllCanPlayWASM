@@ -30,6 +30,10 @@
       "commandName": "Docker",
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "environmentVariables": {
+        "STEAM_API_KEY": "TEST"
+      },
+      "DockerfileRunArguments": "-v steamgamesweallcanplay:/database",
       "publishAllPorts": true,
       "useSSL": true
     }

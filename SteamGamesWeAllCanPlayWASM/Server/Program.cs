@@ -11,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("ConnectionSqlite");
+
 builder.Services.AddAuthentication(options => 
                 { 
                     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme; 
@@ -30,6 +31,10 @@ builder.Services.AddAuthentication(options =>
                     options.CorrelationCookie.SameSite = SameSiteMode.None;
                     options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
                 });
+
+string steamAPIKey = Environment.GetEnvironmentVariable("STEAM_API_KEY");
+
+Console.WriteLine("SteamKey:"+steamAPIKey);
 
 builder.Services.AddDataProtection()
     .SetApplicationName("SteamGamesWeAllCanPlayWASM")

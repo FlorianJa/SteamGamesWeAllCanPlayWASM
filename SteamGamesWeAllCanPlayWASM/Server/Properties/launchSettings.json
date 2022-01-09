@@ -31,9 +31,9 @@
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
       "environmentVariables": {
-        "STEAM_API_KEY": "TEST"
+        "STEAM_API_KEY": "STEAM API KEY GOES HERE"
       },
-      "DockerfileRunArguments": "-v steamgamesweallcanplay:/database -e STEAM_API_KEY=STEAM_API_KEYGOESHERE",
+      "DockerfileRunArguments": "-v steamgamesweallcanplay:/database",
       "publishAllPorts": true,
       "useSSL": true
     }

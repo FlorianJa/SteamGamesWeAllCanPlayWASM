@@ -6,6 +6,7 @@ using SteamGamesWeAllCanPlay.Helper;
 using SteamGamesWeAllCanPlayWASM.Data;
 using SteamGamesWeAllCanPlayWASM.Data.Repositories;
 using SteamGamesWeAllCanPlayWASM.Server.Helpers;
+using SteamWebAPI2.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,8 @@ builder.Services.AddAuthentication(options =>
 string steamAPIKey = Environment.GetEnvironmentVariable("STEAM_API_KEY");
 
 Console.WriteLine("SteamKey:"+steamAPIKey);
+
+builder.Services.AddTransient(x => new SteamWebInterfaceFactory(steamAPIKey));
 
 builder.Services.AddDataProtection()
     .SetApplicationName("SteamGamesWeAllCanPlayWASM")

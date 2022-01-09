@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using SteamGamesWeAllCanPlayWASM.Client;
 using SteamGamesWeAllCanPlayWASM.Client.Services;
+using SteamGamesWeAllCanPlay;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -14,4 +15,5 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, SteamAuthProvider>();
 builder.Services.AddScoped<UserService, UserService>();
+builder.Services.AddSingleton<AppState>();
 await builder.Build().RunAsync();

@@ -5,13 +5,13 @@ using System.Text.Json.Serialization;
 
 namespace SteamGamesWeAllCanPlayWASM.Shared.Models
 {
-    public class MUser
+    public class MUser //only for authentication
     {
         public int Id { get; set; }
         public string SteamId { get; set; }
         public DateTime CreateDate { get; set; }
                 public string Name { get; set; }
-        public string AvatarFullURL { get; set; }
+        //public string AvatarFullURL { get; set; }
 
 
         [JsonIgnore]

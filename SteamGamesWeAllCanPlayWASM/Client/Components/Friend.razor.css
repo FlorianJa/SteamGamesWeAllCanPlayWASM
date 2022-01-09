@@ -1,0 +1,72 @@
+﻿.friend_container {
+    width: 300px;
+    height:65px;
+    float: left;
+    background-color: #1b2838;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.friend_container:hover {
+        cursor: pointer;
+}
+
+.friend_avatar {
+    float: left;
+    width: 70px;
+    margin-right:5px;
+}
+
+.friend_avatar.playing {
+    border-right: solid;
+    border-right-color: #90ba3c;
+    border-right-width: 6px;
+}
+
+.friend_avatar.online {
+    border-right: solid;
+    border-right-color: #57cbde;
+    border-right-width: 6px;
+}
+
+.friend_avatar.offline {
+    border-right: solid;
+    border-right-color: #898989;
+    border-right-width: 6px;
+}
+
+
+.friendContent {
+    overflow: hidden;
+    /*margin: 5px;*/
+}
+.friendContent.playing {
+    color: #e3ffc2
+}
+
+.friendContent.online {
+    color: #57cbde;
+}
+
+.friendContent.offline {
+    color: #898989;
+}
+
+.game {
+    color: #a3cf06;
+    font-size: 0.8em;
+}
+
+.friend_avatar img {
+    height: 65px;
+    width: 65px;
+}
+
+p {
+    margin-bottom: 0px;
+}
+
+.selected
+{
+    outline: 2px solid red;
+}

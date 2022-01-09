@@ -1,11 +1,16 @@
 ﻿@page "/"
+@using Steam.Models.SteamCommunity
+@using SteamGamesWeAllCanPlayWASM.Client.Components
+@using SteamGamesWeAllCanPlayWASM.Client.Services
 @inject AuthenticationStateProvider AuthProvider
+@inject UserService UserService
 
 <PageTitle>Steam games we all can play</PageTitle>
 
 <AuthorizeView>
     <Authorized>
-        <SteamGamesWeAllCanPlayWASM.Client.Components.UserOverview></SteamGamesWeAllCanPlayWASM.Client.Components.UserOverview>                  
+        <SteamGamesWeAllCanPlayWASM.Client.Components.UserOverview></SteamGamesWeAllCanPlayWASM.Client.Components.UserOverview>   
+        <FriendListContainer FriendList=@FriendList></FriendListContainer>
     </Authorized>
     <NotAuthorized>
         Please log in first.
@@ -14,8 +19,9 @@
 
 
 @code{
-    
+
     public string UserName = "";
+    public IEnumerable<PlayerSummaryModel> FriendList;
 
     protected override async Task OnInitializedAsync()
     {
@@ -25,6 +31,10 @@
         if (authstate.User.Identity.Name != null)
         {
             UserName = authstate.User.Identity.Name;
+
+            var steamId = authstate.User.Claims.FirstOrDefault(c => c.Type == "SteamId").Value;
+
+            FriendList = await UserService.GetFriendList(steamId);
         }
     }
 }

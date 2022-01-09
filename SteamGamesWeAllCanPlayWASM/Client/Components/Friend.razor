@@ -1,0 +1,75 @@
+﻿@using Humanizer
+@using Humanizer.Localisation
+@using Steam.Models.SteamCommunity
+@using SteamGamesWeAllCanPlay
+@inject AppState AppState
+
+@if (@Player is not null)
+{
+    <div @onclick="@(()=>ButtonOnClick(Player.SteamId.ToString()))" class="friend_container @((Selected)? "selected" : "")">
+        <div class="friend_avatar @GetState">
+            <img src=@Player.AvatarFullUrl/>
+        </div>
+        <div class="friendContent @GetState">
+            @Player.Nickname
+            @if (@Player.UserStatus != UserStatus.Offline && @Player.PlayingGameName != null)
+            {
+                <br>
+                <span class="game">Spielt @Player.PlayingGameName</span>
+            }
+            @if (@Player.UserStatus == UserStatus.Offline)
+            {
+                <br>
+                <span class="offline">Zuletzt online vor @LastSeen</span>
+            }
+        </div>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public PlayerSummaryModel Player{ get; set; } = null;
+    private const String Playing = "playing";
+    private const String Online = "online";
+    private const String Offline = "offline";
+    public bool Selected = false;
+
+    public string GetState
+    {
+        get
+        {
+            string ret = string.Empty;
+            if(Player.UserStatus != UserStatus.Offline && Player.PlayingGameName != null)
+            {
+                ret = Playing;
+            }
+            else if(Player.UserStatus != UserStatus.Offline && Player.PlayingGameName == null)
+            {
+                ret = Online;
+            }
+            else if(Player.UserStatus == UserStatus.Offline)
+            {
+                ret = Offline;
+            }
+                
+            return ret;
+        }
+    }
+
+    public string LastSeen
+    {
+        get
+        {
+            return (DateTime.Now - Player.LastLoggedOffDate).Humanize(maxUnit: TimeUnit.Day);
+        }
+    }
+    public void ButtonOnClick(string steamId)
+    {
+        Console.WriteLine("OnClick Friend Container:" + steamId);
+        Selected = !Selected;
+        AppState.SelectFriend(steamId);
+
+    }
+
+}

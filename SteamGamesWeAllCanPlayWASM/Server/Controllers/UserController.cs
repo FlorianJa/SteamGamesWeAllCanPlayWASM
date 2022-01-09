@@ -84,5 +84,15 @@ namespace SteamGamesWeAllCanPlayWASM.Server.Controllers
 
             return Ok(overview);
         }
+
+        [HttpGet("{steamId}/friendlist")]
+        public async Task<IActionResult> GetUserFriendList(string steamId)
+        {
+            var friendListResponse = await _steamFactory.CreateSteamWebInterface<SteamUser>(_client).GetFriendsListAsync(ulong.Parse(steamId));
+            var playerSummariesResponse = await _steamFactory.CreateSteamWebInterface<SteamUser>(_client).GetPlayerSummariesAsync(friendListResponse.Data.Select(p => p.SteamId).ToList());
+
+
+            return Ok(playerSummariesResponse.Data);
+        }
     }
 }

@@ -63,7 +63,7 @@ namespace SteamGamesWeAllCanPlayWASM.Server.Helpers
             if (playerSummary != null)
             {
                 user.Name = playerSummary.Nickname;
-                user.AvatarFullURL = playerSummary.AvatarFullUrl;
+                //user.AvatarFullURL = playerSummary.AvatarFullUrl;
             }
 
             await usersRepository.AddAsync(user);

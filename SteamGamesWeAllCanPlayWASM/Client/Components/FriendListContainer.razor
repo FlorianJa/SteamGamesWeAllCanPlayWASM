@@ -1,0 +1,141 @@
+﻿@using Steam.Models.SteamCommunity
+<h3>Deine Freunde (@FriendCount)</h3>
+
+@if(@PlayingFriendsCount > 0)
+{
+    <div style="clear: both;">
+        <p>Im Spiel</p>
+        @foreach (var playingFriend in PlayingFriends)
+        {
+            <Friend Player=@playingFriend></Friend>
+        } 
+    </div>
+    <br />
+}
+
+@if(@OnlineFriendsCount > 0)
+{
+    <div style="clear: both;">
+    <p>Online</p>
+    @foreach (var onlineFriend in OnlineFriends)
+    {
+        <Friend Player=@onlineFriend></Friend>
+    } 
+    </div>
+}
+
+@if(@OfflineFriendsCount > 0)
+{
+    <div style="clear: both;">
+
+
+    <button class="collapsible @((Collapsed)? "" : "active")"  @onclick="CollapseOfflineFriends">
+        Offline
+    </button>
+
+    <div class="content" style=@collapseStyle>
+        @foreach (var offlineFriend in OfflineFriends)
+        {
+            <Friend Player=@offlineFriend></Friend>
+        } 
+        </div>
+    </div>
+}
+
+
+@code {
+
+    [Parameter]
+    public IEnumerable<PlayerSummaryModel> FriendList { get; set; } = null;
+
+    public bool Collapsed = true;
+    public string collapseStyle = string.Empty;
+
+
+    //protected override Task OnInitializedAsync()
+    //{
+    //    return null;
+    //}
+
+    //protected override Task OnParametersSetAsync()
+    //{
+    //    return null;
+    //}
+
+    public void CollapseOfflineFriends()
+    {
+        this.Collapsed = !this.Collapsed;
+
+
+        if(Collapsed)
+        {
+            collapseStyle = "max-height: null";
+        }
+        else
+        {
+            collapseStyle = "max-height:100%";
+        }
+    }
+
+    public int FriendCount
+    {
+        get
+        {
+            return FriendList?.Count() ?? 0;
+        }
+    }
+
+    public IEnumerable<PlayerSummaryModel> PlayingFriends
+    {
+        get
+        {
+            var ret = FriendList?.Where(f => f.UserStatus == UserStatus.Online && f.PlayingGameName != null);
+            return ret;
+        }
+    }
+
+    public IEnumerable<PlayerSummaryModel> OnlineFriends
+    {
+        get
+        {
+            var ret = FriendList?.Where(f => (f.UserStatus != UserStatus.Offline) && f.PlayingGameName == null);
+            return ret;
+        }
+    }
+
+    public IEnumerable<PlayerSummaryModel> OfflineFriends
+    {
+        get
+        {
+            var ret = FriendList?.Where(f => f.UserStatus == UserStatus.Offline);
+            return ret;
+        }
+    }
+
+
+    public int PlayingFriendsCount
+    {
+        get
+        {
+            var count = PlayingFriends?.Count() ?? 0;
+            return count;
+        }
+    }
+
+    public int OnlineFriendsCount
+    {
+        get
+        {
+            var count = OnlineFriends?.Count() ?? 0;
+            return count;
+        }
+    }
+    public int OfflineFriendsCount
+    {
+        get
+        {
+            var count = OfflineFriends?.Count() ?? 0;
+            return count;
+        }
+    }
+}

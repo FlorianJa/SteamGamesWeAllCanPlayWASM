@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 //var connectionString = builder.Configuration.GetConnectionString("ConnectionSqlite");
-string connectionString = Environment.GetEnvironmentVariable("CONNECTIONSTRING_SQLITE");
+string connectionString = Environment.GetEnvironmentVariable("CONNECTIONSTRING_SQLITE") ?? "Filename=SteamGamesWeAllCanPlayDB.db"; //default only for debugging
 
 builder.Services.AddDbContext<ApplicationContext>(options =>
     options.UseSqlite(connectionString));

@@ -59,13 +59,12 @@ else
 
     private async void CompareGameLibraries()
     {
-        //Console.WriteLine(new StackFrame(1).GetMethod().Name);
         var steamIds = new List<string>() { SteamId };
         steamIds.AddRange(AppState.SelectedFriends.ToList());
-        //var response = await steamProfileService.GetComparedLibrariesAsync(steamIds);
-        //Games = response.ToList();
+        var response = await SteamService.GetComparedLibrariesAsync(steamIds);
+        Games = response.ToList();
         //Console.WriteLine(Games.Count + " Games after friend selected");
-        //await InvokeAsync(StateHasChanged);
+        await InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()

@@ -1,25 +1,24 @@
 ﻿@using SteamGamesWeAllCanPlayWASM.Client.Services
 @using SteamGamesWeAllCanPlayWASM.Shared.Models
 @inject AuthenticationStateProvider AuthProvider
-@inject UserService userService
+@inject SteamService userService
 
 <div class="overviewContainer">
-    <div class="avatar">
-        <img src=@overview.AvatarFullURL/>
-    </div>
-    <div class="userName">
-        @if (@UserName != string.Empty)
-        {
+    @if(@overview != null)
+    {
+        <div class="avatar">
+            <img src=@overview.AvatarFullURL/>
+        </div>
+        <div class="userName">
             <h2>@UserName</h2>
             <p>@overview.FriendsCount Freunde (davon @FriendsOnline online)</p>
             <p>@overview.GameCount Spiele in der Bibliothek</p>
-        }
-        else
-        {
-            <p>Loading...</p>
-        }
-    </div>
-
+        </div>
+    }
+    else
+    {
+        <p>Loading...</p>
+    }
 </div>
 
 
@@ -49,26 +48,5 @@
             //Games = overview.GameCount;
             //AvatarURL = overview.AvatarFullURL;
         }
-
-       
-        //if(authstate.User != null)
-        //{
-        //    var user = authstate.User;
-        //    var steamId = user.Identity.Name;
-
-        //    var players = await steamProfileService.GetPlayerSummariesAsync(new List<string>(){ steamId });
-        //    if (players.Count() > 0)
-        //    {
-        //        var player = players.First();
-        //        UserName = player.PersonaName;
-        //        AvatarURL = player.AvatarFull;
-        //    }
-
-        //    var FriendList = await steamProfileService.GetFriendListAsync(steamId);
-        //    FriendCount = FriendList.Count();
-        //    FriendsOnline = FriendList.Count(p => p.PersonaState != 0);
-
-        //    Games = await steamProfileService.GetGameCount(steamId);
-        //}
     }
 }

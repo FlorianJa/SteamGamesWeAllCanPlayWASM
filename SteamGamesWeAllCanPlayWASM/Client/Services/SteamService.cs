@@ -5,11 +5,11 @@ using System.Net.Http.Json;
 
 namespace SteamGamesWeAllCanPlayWASM.Client.Services
 {
-    public class UserService
+    public class SteamService
     {
         public readonly HttpClient _httpClient;
 
-        public UserService(HttpClient httpClient)
+        public SteamService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
@@ -33,6 +33,19 @@ namespace SteamGamesWeAllCanPlayWASM.Client.Services
                 var friendList = await response.Content.ReadFromJsonAsync<IEnumerable<PlayerSummaryModel>>();
 
                 return friendList;
+            }
+            return null;
+        }
+
+        public async Task<IReadOnlyCollection<OwnedGameModel>> GetOwnedGamesAsync(string steamId)
+        {
+            var response = await _httpClient.GetAsync($"api/user/{steamId}/ownedgames");
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                var text = await response.Content.ReadAsStringAsync();
+                var ownedGames = await response.Content.ReadFromJsonAsync<OwnedGamesResultModel>();
+
+                return ownedGames.OwnedGames;
             }
             return null;
         }

@@ -1,0 +1,22 @@
+﻿@using Steam.Models.SteamCommunity
+
+
+<div class="gameContainer">
+    <div>
+        <img src="@imgUrl"/>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public OwnedGameModel GameData { get; set; } = null;
+
+    public string imgUrl
+    {
+        get
+        {
+            return $"http://media.steampowered.com/steamcommunity/public/images/apps/{GameData.AppId}/{GameData.ImgLogoUrl}.jpg";
+        }
+    }
+    
+}

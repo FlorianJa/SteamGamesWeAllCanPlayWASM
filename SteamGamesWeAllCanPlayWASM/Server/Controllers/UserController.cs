@@ -96,5 +96,13 @@ namespace SteamGamesWeAllCanPlayWASM.Server.Controllers
 
             return Ok(playerSummariesResponse.Data);
         }
+
+        [HttpGet("{steamId}/ownedgames")]
+        public async Task<IActionResult> GetOwnedGames(string steamId)
+        {
+            var gamesResponse = await _steamFactory.CreateSteamWebInterface<PlayerService>(_client).GetOwnedGamesAsync(ulong.Parse(steamId), includeAppInfo: true, includeFreeGames: true);
+
+            return Ok(gamesResponse.Data);
+        }
     }
 }

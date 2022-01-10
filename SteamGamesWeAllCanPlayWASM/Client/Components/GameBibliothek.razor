@@ -1,0 +1,93 @@
+﻿@using System.Diagnostics
+@using Steam.Models.SteamCommunity
+@using SteamGamesWeAllCanPlay
+@using SteamGamesWeAllCanPlayWASM.Client.Services
+@implements IDisposable
+@inject AppState AppState
+@inject SteamService SteamService
+
+<h3>Deine Spiele</h3>
+
+@if(Games is not null)
+{
+    
+    <button @onclick="SortByPlayTime">Nach Spielzeit sortieren</button>
+    <button @onclick="SortByAlphabet">Alphabetisch sortieren</button>
+    <button @onclick="PlayedIn2Weeks">@PlayedIn2WeeksButtonText</button>
+    <div class="GamesCollection">
+        @foreach (var game in Games)
+        {
+            @if(PlayedIn2WeeksOnly)
+            {
+                @if (@game.PlaytimeLastTwoWeeks > TimeSpan.Zero)
+                {
+                    <Game GameData=@game></Game>
+                }
+            }
+            else
+            {
+                <Game GameData=@game></Game>
+            }
+        }
+    </div>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+
+
+@code {
+    [Parameter]
+    public string SteamId { get; set; }
+    public List<OwnedGameModel> Games { get; set; } = null;
+    public bool PlayedIn2WeeksOnly = false;
+    public string PlayedIn2WeeksButtonText = "Nur in den letzten zwei Wochen gespielt";
+
+    private const string OnlyPlayedIn2WeeksText = "Nur in den letzten zwei Wochen gespielt";
+    private const string ShowAllText = "Alle anzeigen";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        AppState.OnChange += CompareGameLibraries;
+        AppState.OnChange += StateHasChanged;
+        var response = await SteamService.GetOwnedGamesAsync(SteamId);
+        Games = response.OrderBy( g => g.Name).ToList();
+        Console.WriteLine(Games.Count() + " Games after init");
+    }
+
+    private async void CompareGameLibraries()
+    {
+        //Console.WriteLine(new StackFrame(1).GetMethod().Name);
+        var steamIds = new List<string>() { SteamId };
+        steamIds.AddRange(AppState.SelectedFriends.ToList());
+        //var response = await steamProfileService.GetComparedLibrariesAsync(steamIds);
+        //Games = response.ToList();
+        //Console.WriteLine(Games.Count + " Games after friend selected");
+        //await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        AppState.OnChange -= CompareGameLibraries;
+        //AppState.OnChange -= StateHasChanged;
+    }
+
+    private void SortByPlayTime()
+    {
+        Games = Games.OrderByDescending(g => g.PlaytimeForever).ToList();
+    }
+
+    private void SortByAlphabet()
+    {
+        Games = Games.OrderBy(g => g.Name).ToList();
+    }
+
+    private void PlayedIn2Weeks()
+    {
+        PlayedIn2WeeksOnly = !PlayedIn2WeeksOnly;
+        PlayedIn2WeeksButtonText = PlayedIn2WeeksOnly ? ShowAllText : OnlyPlayedIn2WeeksText;
+    }
+
+}

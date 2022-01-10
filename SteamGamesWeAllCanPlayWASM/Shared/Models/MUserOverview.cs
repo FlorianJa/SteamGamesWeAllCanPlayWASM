@@ -11,5 +11,7 @@ namespace SteamGamesWeAllCanPlayWASM.Shared.Models
         public int FriendsCount { get; set; }
         public int FriendsOnline { get; set; }
         public uint GameCount { get; set; }
+
+        public string AvatarFullURL { get; set; }
     }
 }

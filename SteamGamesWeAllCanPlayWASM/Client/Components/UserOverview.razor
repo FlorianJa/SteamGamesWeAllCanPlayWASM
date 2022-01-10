@@ -1,17 +1,18 @@
 ﻿@using SteamGamesWeAllCanPlayWASM.Client.Services
+@using SteamGamesWeAllCanPlayWASM.Shared.Models
 @inject AuthenticationStateProvider AuthProvider
 @inject UserService userService
 
 <div class="overviewContainer">
     <div class="avatar">
-        <img src=@AvatarURL/>
+        <img src=@overview.AvatarFullURL/>
     </div>
     <div class="userName">
         @if (@UserName != string.Empty)
         {
             <h2>@UserName</h2>
-            <p>@FriendCount Freunde (davon @FriendsOnline online)</p>
-            <p>@Games Spiele in der Bibliothek</p>
+            <p>@overview.FriendsCount Freunde (davon @FriendsOnline online)</p>
+            <p>@overview.GameCount Spiele in der Bibliothek</p>
         }
         else
         {
@@ -30,6 +31,7 @@
     public int FriendCount = 0;
     public int FriendsOnline = 0;
     public uint Games = 0;
+    public MUserOverview overview { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -40,11 +42,12 @@
         {
             UserName = authstate.User.Identity.Name;
             var steamid = authstate.User.Claims.FirstOrDefault(c => c.Type == "SteamId").Value;
-            var overview = await userService.GetOverviewAsync(steamid);
+            overview = await userService.GetOverviewAsync(steamid);
 
-            FriendCount = overview.FriendsCount;
-            FriendsOnline = overview.FriendsOnline;
-            Games = overview.GameCount;
+            //FriendCount = overview.FriendsCount;
+            //FriendsOnline = overview.FriendsOnline;
+            //Games = overview.GameCount;
+            //AvatarURL = overview.AvatarFullURL;
         }
 
        

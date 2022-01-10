@@ -67,10 +67,11 @@ namespace SteamGamesWeAllCanPlayWASM.Server.Controllers
         [HttpGet("{steamId}/overview")]
         public async Task<IActionResult> GetUserOverview(string steamId)
         {
+            var playerSummary = await _steamFactory.CreateSteamWebInterface<SteamUser>(_client).GetPlayerSummaryAsync(ulong.Parse(steamId));
             var friendListResponse = await _steamFactory.CreateSteamWebInterface<SteamUser>(_client).GetFriendsListAsync(ulong.Parse(steamId));
-            var playerSummariesResponse = await _steamFactory.CreateSteamWebInterface<SteamUser>(_client).GetPlayerSummariesAsync(friendListResponse.Data.Select(p => p.SteamId).ToList());
+            var friendPlayerSummariesResponse = await _steamFactory.CreateSteamWebInterface<SteamUser>(_client).GetPlayerSummariesAsync(friendListResponse.Data.Select(p => p.SteamId).ToList());
             var friendCount = friendListResponse.Data.Count();
-            var onlineFriendCount = playerSummariesResponse.Data.Count(s => s.UserStatus != Steam.Models.SteamCommunity.UserStatus.Offline);
+            var onlineFriendCount = friendPlayerSummariesResponse.Data.Count(s => s.UserStatus != Steam.Models.SteamCommunity.UserStatus.Offline);
 
             var gamesResponse = await _steamFactory.CreateSteamWebInterface<PlayerService>(_client).GetOwnedGamesAsync(ulong.Parse(steamId), includeFreeGames: true);
             var gameCount = gamesResponse.Data.GameCount;
@@ -79,7 +80,8 @@ namespace SteamGamesWeAllCanPlayWASM.Server.Controllers
             {
                 FriendsOnline = onlineFriendCount,
                 FriendsCount = friendCount,
-                GameCount = gameCount
+                GameCount = gameCount,
+                AvatarFullURL = playerSummary.Data.AvatarFullUrl
             };
 
             return Ok(overview);

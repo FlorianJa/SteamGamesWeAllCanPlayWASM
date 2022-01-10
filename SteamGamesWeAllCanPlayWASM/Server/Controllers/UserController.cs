@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using SteamGamesWeAllCanPlayWASM.Data.Repositories;
+using SteamGamesWeAllCanPlayWASM.Sharded.Repositories;
 using SteamGamesWeAllCanPlayWASM.Shared.Models;
 using SteamWebAPI2.Interfaces;
 using SteamWebAPI2.Utilities;
@@ -15,12 +16,14 @@ namespace SteamGamesWeAllCanPlayWASM.Server.Controllers
     {
 
         private readonly IUserRepository _userRepo;
+        private readonly IPlayerSummaryRepository _playerSummaryRepo;
         private readonly SteamWebInterfaceFactory _steamFactory;
         private readonly HttpClient _client;
 
-        public UserController(IUserRepository userRepo, SteamWebInterfaceFactory steamFactory, HttpClient client)
+        public UserController(IUserRepository userRepo, IPlayerSummaryRepository playerSummaryRepo, SteamWebInterfaceFactory steamFactory, HttpClient client)
         {
             _userRepo = userRepo;
+            _playerSummaryRepo = playerSummaryRepo;
             _steamFactory = steamFactory;
             _client = client;
         }
@@ -67,11 +70,42 @@ namespace SteamGamesWeAllCanPlayWASM.Server.Controllers
         [HttpGet("{steamId}/overview")]
         public async Task<IActionResult> GetUserOverview(string steamId)
         {
-            var playerSummary = await _steamFactory.CreateSteamWebInterface<SteamUser>(_client).GetPlayerSummaryAsync(ulong.Parse(steamId));
-            var friendListResponse = await _steamFactory.CreateSteamWebInterface<SteamUser>(_client).GetFriendsListAsync(ulong.Parse(steamId));
-            var friendPlayerSummariesResponse = await _steamFactory.CreateSteamWebInterface<SteamUser>(_client).GetPlayerSummariesAsync(friendListResponse.Data.Select(p => p.SteamId).ToList());
-            var friendCount = friendListResponse.Data.Count();
-            var onlineFriendCount = friendPlayerSummariesResponse.Data.Count(s => s.UserStatus != Steam.Models.SteamCommunity.UserStatus.Offline);
+            MPlayerSummary playerSummary;
+            playerSummary = _playerSummaryRepo.GetByPlayerSummarySteamId(steamId);
+
+            if (playerSummary == null)
+            {
+                playerSummary = new MPlayerSummary((await _steamFactory.CreateSteamWebInterface<SteamUser>(_client).GetPlayerSummaryAsync(ulong.Parse(steamId))).Data);
+                await _playerSummaryRepo.AddAsync(playerSummary);
+            }
+
+
+            if (playerSummary.Friends == null)
+            {
+                var friendListResponse = await _steamFactory.CreateSteamWebInterface<SteamUser>(_client).GetFriendsListAsync(ulong.Parse(steamId));
+                var friendPlayerSummariesResponse = await _steamFactory.CreateSteamWebInterface<SteamUser>(_client).GetPlayerSummariesAsync(friendListResponse.Data.Select(p => p.SteamId).ToList());
+
+                var friendList = friendPlayerSummariesResponse.Data;
+                if(playerSummary.Friends == null)
+                {
+                    playerSummary.Friends = new List<MPlayerSummary>();
+                }
+                else
+                {
+                    playerSummary.Friends?.Clear();
+                }
+                foreach (var friend in friendList)
+                {
+                    playerSummary.Friends.Add(new MPlayerSummary(friend));
+
+                }
+
+                await _playerSummaryRepo.SaveChanges();
+            }
+            
+            
+            var friendCount = playerSummary.Friends.Count();
+            var onlineFriendCount = playerSummary.Friends.Count(s => s.UserStatus != Steam.Models.SteamCommunity.UserStatus.Offline);
 
             var gamesResponse = await _steamFactory.CreateSteamWebInterface<PlayerService>(_client).GetOwnedGamesAsync(ulong.Parse(steamId), includeFreeGames: true);
             var gameCount = gamesResponse.Data.GameCount;
@@ -81,7 +115,7 @@ namespace SteamGamesWeAllCanPlayWASM.Server.Controllers
                 FriendsOnline = onlineFriendCount,
                 FriendsCount = friendCount,
                 GameCount = gameCount,
-                AvatarFullURL = playerSummary.Data.AvatarFullUrl
+                AvatarFullURL = playerSummary.AvatarFullUrl
             };
 
             return Ok(overview);
@@ -90,11 +124,39 @@ namespace SteamGamesWeAllCanPlayWASM.Server.Controllers
         [HttpGet("{steamId}/friendlist")]
         public async Task<IActionResult> GetUserFriendList(string steamId)
         {
-            var friendListResponse = await _steamFactory.CreateSteamWebInterface<SteamUser>(_client).GetFriendsListAsync(ulong.Parse(steamId));
-            var playerSummariesResponse = await _steamFactory.CreateSteamWebInterface<SteamUser>(_client).GetPlayerSummariesAsync(friendListResponse.Data.Select(p => p.SteamId).ToList());
+            var playerSummary = _playerSummaryRepo.GetByPlayerSummarySteamId(steamId);
 
+            // hier sollte refactored werden und die beiden if's in eine neue Funktion verschoben werden.
+            if (playerSummary == null)
+            {
+                playerSummary = new MPlayerSummary((await _steamFactory.CreateSteamWebInterface<SteamUser>(_client).GetPlayerSummaryAsync(ulong.Parse(steamId))).Data);
+                await _playerSummaryRepo.AddAsync(playerSummary);
+            }
 
-            return Ok(playerSummariesResponse.Data);
+            if (playerSummary.Friends == null)
+            {
+                var friendListResponse = await _steamFactory.CreateSteamWebInterface<SteamUser>(_client).GetFriendsListAsync(ulong.Parse(steamId));
+                var friendPlayerSummariesResponse = await _steamFactory.CreateSteamWebInterface<SteamUser>(_client).GetPlayerSummariesAsync(friendListResponse.Data.Select(p => p.SteamId).ToList());
+
+                var friendList = friendPlayerSummariesResponse.Data;
+                if (playerSummary.Friends == null)
+                {
+                    playerSummary.Friends = new List<MPlayerSummary>();
+                }
+                else
+                {
+                    playerSummary.Friends?.Clear();
+                }
+                foreach (var friend in friendList)
+                {
+                    playerSummary.Friends.Add(new MPlayerSummary(friend));
+
+                }
+
+                await _playerSummaryRepo.SaveChanges();
+            }
+
+            return Ok(playerSummary.Friends);
         }
 
         [HttpGet("{steamId}/ownedgames")]

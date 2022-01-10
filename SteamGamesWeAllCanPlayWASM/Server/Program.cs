@@ -7,6 +7,8 @@ using SteamGamesWeAllCanPlayWASM.Client.Services;
 using SteamGamesWeAllCanPlayWASM.Data;
 using SteamGamesWeAllCanPlayWASM.Data.Repositories;
 using SteamGamesWeAllCanPlayWASM.Server.Helpers;
+using SteamGamesWeAllCanPlayWASM.Sharded.Repositories;
+using SteamGamesWeAllCanPlayWASM.Shared.Repositories;
 using SteamWebAPI2.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +54,7 @@ builder.Services.AddDataProtection()
 
 builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddTransient<IUserRepository, UserRepository>();
+builder.Services.AddTransient<IPlayerSummaryRepository, PlayerSummaryRepository>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
